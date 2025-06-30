@@ -1,0 +1,42 @@
+.PopUp-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.PopUp-content h2{
+    font-family: "Poppins", sans-serif;
+    font-size: 20px;
+    color: #ffbb08;
+    margin-bottom: 10px;
+}
+.PopUp-content p{
+    font-family: "Poppins", sans-serif;
+    font-size: 15px;
+    color: #5e5e5e;
+    margin-bottom: 15px;
+}
+.PopUp-content {
+    background: rgb(255, 255, 255);
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    text-align: center;
+    border: 1px solid black ;   
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.PopUp-content button {
+    margin: 10px;
+    border: none;
+    background-color: #27375d;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+}

@@ -1,0 +1,126 @@
+.NL_compose{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+.NL_compose h2{
+    font-size: 30px;
+    margin-left: 15px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.NL_compose h2 span{
+    margin-top: 3px;
+    cursor: pointer;
+}
+.compose_form1{
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    
+}
+.submitresult{
+    width: 500px;
+    background-color: #f9f9f9;
+    padding: 20px 30px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.submitresult button{
+    margin-top: 10px !important;
+}
+.compose_form1 form{
+    width: 500px;
+    background-color: #f9f9f9;
+    padding: 20px 30px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.compose_form1 h5{
+    color: #ffbb08;
+    font-family: "Poppins", sans-serif;
+    text-align: center;
+    font-size: 17px;
+    margin: 10px 0px;
+    font-weight: 600;
+}
+.NL_compose_row{
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.compose_form1 label{
+    color: #5e5e5e;
+    font-family: "Poppins", sans-serif;
+    font-size: 15px;
+}
+.compose_form1 input{
+    width: 250px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fff;
+}
+
+.NL_compose button{
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    background-color: #27375d;
+    font-size: 13px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.NL_submit_button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.compose_option{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 60px;
+}
+.compose_option-box{
+    display: flex;
+    gap: 100px;
+    cursor: pointer;
+}
+.compose_option-box img{
+    width: 280px;
+    height: 250px;
+}
+.compose_option-box h5{
+    font-size: 20px;
+    font-family: "Poppins", sans-serif;
+    color: #27375d;
+}
+.compose_options{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s;
+}
+.compose_options:hover{
+    scale: 1.1;
+    transition: all 0.5s;
+}

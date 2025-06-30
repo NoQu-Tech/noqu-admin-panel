@@ -1,0 +1,269 @@
+.CMS-head{
+    margin-top: 20px;
+    padding-left: 20px;
+    /* margin-bottom: 50px; */
+    width: 100%;
+    display: flex;
+    align-items: start;
+    justify-content: left;
+    /* justify-content: ; */
+}
+.CMS-head h1{
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.CMS-content{
+    width: 100%;
+}
+.CMS-content table{
+    width: 100%;
+    border-collapse: collapse;
+}
+.CMS-content table, th, td {
+    border: 1px solid;
+    border: 1px solid #eeeeee;
+    text-align: center;
+    font-size: 14px;
+  }
+  .CMS-content th{
+      height: 70px;
+    
+    font-size: 15px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    /* color: #27375d; */
+}
+.CMS-content td{
+    height: 40px;
+    padding: 10px 20px;
+}
+.CMS-content td button{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    scale: 1;
+}
+.CMS-content-head{
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin: 15px;
+    gap: 15px;
+}
+.CMS-content h1{
+    font-size: 25px;
+    text-align: center;
+}
+.CMS-content-head button{
+    width: 100px;
+    height: 37px;
+    font-size: 15px;
+    /* font-weight: 600; */
+    color: #fff;
+    background-color: #ffbb08;
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    cursor: pointer;
+}
+.CMS-content-head-refresh{
+    font-size: 16px;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    border: 2px solid #ffbb08;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: #fcf2da;
+}
+.CMS-content-head input{
+    outline: none;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    border: 2px solid #ffbb08;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: #fcf2da;
+}
+.CMS_add-News button span{
+    font-size: 25px;
+    font-weight: 500;
+}
+.CMS-content tr:nth-child(even){
+    background-color: #eeeeee;
+}
+.CMS_add-News-form form{
+    width: 800px;
+    background-color: #f9f9f9;
+    padding: 20px 30px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.CMS_add-News-form h5{
+    color: #27375d;
+    font-family: "Poppins", sans-serif;
+    text-align: center;
+    font-size: 17px;
+    margin: 10px 0px;
+    font-weight: 600;
+}
+.CMS_add-News-form_row{
+    width: 90%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: left;
+}
+.CMS_add-News-form label{
+    color: #5e5e5e;
+    font-family: "Poppins", sans-serif;
+    font-size: 15px;
+    width: 200px;
+}
+.CMS_add-News-form input{
+    width: 90%;
+    border: 1px solid #ffbb08;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fff;
+    outline-width: 0;
+}
+.CMS_add-News-section{
+    width: 90%;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: left;
+    gap: 20px;
+}
+.CMS_add-News-section-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.CMS_add-News-section-head-lable{
+    display: flex;
+    align-items: center;
+    justify-content: left !important;
+}
+.News-layout{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.CMS_add-News-section-head label{
+    color: #5e5e5e;
+    font-family: "Poppins", sans-serif;
+    font-size: 15px;
+    width: auto;
+}
+.CMS_add-News-section select{
+    width: 200px;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #ffbb08;
+    color: #fff;
+    outline-width: 0;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1);
+}
+.CMS_add-News-section option{
+    background-color: #fff;
+    cursor: pointer;
+    color: black;
+}
+.CMS_add-News-section textarea{
+    width: 100% !important;
+    height: 150px;
+    border: 1px solid #ffbb08;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fff;
+    outline-width: 0;
+}
+.CMS_add-News-section input{
+    width: 100% !important;
+    border: 1px solid #ffbb08;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fff;
+    outline-width: 0;
+}
+.CMS_add-News-section-button{
+    /* width: 100%; */
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+.CMS_add-News-section-button button{
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.CMS_add-News-form-add-section-button{
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+.CMS_add-News-form-add-section-button button{
+    border: none;
+    padding: 5px 10px;
+    background-color: #4fb7ef;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    /* margin-top: -80px; */
+}
+.CMS_add-News-form-add-section-button button span{
+    font-size: 25px;
+}
+
+.CMS_add-News-form textarea{
+    width: 90%;
+    height: 150px;
+    border: 1px solid #ffbb08;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fff;
+    outline-width: 0;
+}
+.CMS_add-News-form_button button{
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    background-color: #27375d;
+    font-size: 13px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.CMS-other-content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+}
