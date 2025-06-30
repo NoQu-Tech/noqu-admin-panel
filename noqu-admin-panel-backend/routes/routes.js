@@ -41,9 +41,21 @@ const {
   getLeads,
   getLeadDetail,
   cpAgreement,
+  downloadCPAgreement,
   getCPBusinessCommissions,
   updateLeadStageWithDetails,
+  getCPBankDetails,
+  saveCPBankDetails,
+  updateCPBankDetails,
+  getCommissionDetails,
+  cpForgotPasswordInit,
+  cpForgotPasswordVerify,
+  
 } = require('../controllers/cpController');
+
+const {
+  createPayout,
+} = require('../controllers/razorpaySimController');
 
 //Login route
 router.post('/db/login-admin', loginAdmin);
@@ -86,10 +98,24 @@ router.post('/db/update-cp-member', auth, requireRole('cp', 'admin', 'accounts')
 router.post('/db/add-lead', auth, requireRole('cp'), addLead);
 router.get('/db/get-leads/:userId', auth, requireRole('cp'), getLeads);
 router.get('/db/lead-detail/:leadId', auth, requireRole('cp'), getLeadDetail);
-router.post('/db/upload-agreement', auth, requireRole('cp'), uploadAgreement, cpAgreement);
+router.post('/db/upload-agreement', auth, requireRole('cp', 'admin'), uploadAgreement,  cpAgreement);
+router.get('/db/download-agreement/:filename', auth, uploadAgreement, downloadCPAgreement);
 
 router.get('/db/get-commissions/:userId', auth, requireRole('cp'), getCPBusinessCommissions);
 router.post('/db/update-lead-stage-details', updateLeadStageWithDetails);
 
+
+router.get('/db/cp-bank-details/:cpId', getCPBankDetails);
+router.post('/db/cp-bank-details', saveCPBankDetails);
+router.post('/db/cp-bank-details/update', updateCPBankDetails);
+
+//razorpaySimController routes
+router.post('/db/razorpay-payout', createPayout);
+
+router.get('/db/get-commission-details', getCommissionDetails);
+router.post('/db/cp-forgot-password-init', cpForgotPasswordInit);
+router.post('/db/cp-forgot-password-verify', cpForgotPasswordVerify);
+
+    
 
 module.exports = router;

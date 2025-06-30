@@ -65,7 +65,7 @@ const uploadEditNews = multer({
 
 const agreementStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../public_html/agreements/CP-Agreements');
+    const uploadPath = '/home/noqu/agreements/CP-Agreements';
     fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
@@ -87,7 +87,12 @@ const uploadAgreement = multer({
     if (file.mimetype === 'application/pdf') cb(null, true);
     else cb(new Error('Only PDF files allowed'), false);
   }
-}).single('agreement');
+}).fields([
+  { name: 'agreement', maxCount: 1 },
+  { name: 'cpId', maxCount: 1 },
+  { name: 'full_name', maxCount: 1 },
+  { name: 'company_name', maxCount: 1 },
+]);
 
 // Export the configured middlewares
 module.exports = {

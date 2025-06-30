@@ -1,4 +1,4 @@
-const db = require('../models/db');
+const { db } = require('../models/db');
 // const upload = require('../middlewares/upload'); // Import multer config
 const { uploadFields, uploadEditNews } = require('../middlewares/upload');
 const path = require('path');

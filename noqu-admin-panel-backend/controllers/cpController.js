@@ -1,10 +1,12 @@
 // controllers/cpController.js
 
-const db = require('../models/db'); // MySQL Connection pool
+const { db } = require('../models/db');
+const { dbAsync } = require('../models/db');
 const { sendEmail } = require('../services/emailservices');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken'); 
 const path = require('path');
+const fs = require('fs');
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -429,7 +431,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const hash = await bcrypt.hash(newPassword, 10);
     db.query(
-      `UPDATE channel_partners SET password_hash = ?, temp_password = false, status = 'active', updated_at = NOW() WHERE id = ?`,
+      `UPDATE channel_partners SET password_hash = ?, temp_password = false, updated_at = NOW() WHERE id = ?`,
       [hash, id],
       (err, result) => {
         if (err) {
@@ -538,16 +540,16 @@ exports.getLeadDetail = (req, res) => {
 
 
 exports.cpAgreement = (req, res) => {
-  const { cpId } = req.body;
-  const uploadedFileName = req.file?.filename;
+  // multer.fields() stores form fields as arrays
+  const cpId = Array.isArray(req.body.cpId) ? req.body.cpId[0] : req.body.cpId;
+  const uploadedFileName = req.files?.agreement?.[0]?.filename;
 
   console.log('req.body:', req.body);
-  console.log('req.file:', req.file);
+  console.log('req.files:', req.files);
 
   if (!cpId) return res.status(400).json({ message: 'cpId is required' });
-  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+  if (!uploadedFileName) return res.status(400).json({ message: 'No file uploaded' });
 
-  // Construct relative file name (saved in DB)
   const agreementUrl = uploadedFileName;
 
   const sql = `UPDATE channel_partners SET agreement_url = ? WHERE id = ?`;
@@ -564,6 +566,25 @@ exports.cpAgreement = (req, res) => {
     });
   });
 };
+
+
+exports.downloadCPAgreement = (req, res) => {
+  const { filename } = req.params;
+  const user = req.user; // comes from authenticateToken middleware
+  const filePath = path.join('/home/noqu/agreements/CP-Agreements', filename);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ message: 'File not found' });
+  }
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.pipe(res);
+};
+
+
 
 exports.getCPBusinessCommissions = (req, res) => {
   const { userId } = req.params;
@@ -596,11 +617,16 @@ exports.getCPBusinessCommissions = (req, res) => {
 };
 
 exports.updateLeadStageWithDetails = (req, res) => {
-  const { leadId, stage, details } = req.body;
+  let { leadId, stage, details } = req.body;
 
-  if (!leadId || !stage || !details) {
+  console.log('Incoming payload:', stage);
+
+  if (!leadId || typeof stage !== 'string' || !details) {
     return res.status(400).json({ message: 'Missing leadId, stage, or details' });
   }
+
+  // Ensure JSON string format
+  const stringifiedDetails = JSON.stringify(details);
 
   const updateSql = `
     UPDATE leads
@@ -608,26 +634,26 @@ exports.updateLeadStageWithDetails = (req, res) => {
     WHERE id = ?
   `;
 
-  const values = [
-    stage,
-    JSON.stringify(details),
-    leadId
-  ];
-
-  db.query(updateSql, values, (err, result) => {
+  db.query(updateSql, [stage, stringifiedDetails, leadId], (err, result) => {
     if (err) {
       console.error('Lead update failed:', err);
       return res.status(500).json({ message: 'Database error' });
     }
 
-    // 🔁 Extract sale amount from JSON only if stage is "sale-completed"
+    // Optional: log affected rows
+    console.log('Lead updated successfully:', result.affectedRows);
+
+    // 🔁 Commission insert only for "sale-completed"
     if (stage === 'sale-completed' && details.sale_amount) {
       const saleAmount = details.sale_amount;
       const percent = 10;
       const commission = (saleAmount * percent) / 100;
 
       db.query(`SELECT id FROM commission_requests WHERE lead_id = ?`, [leadId], (err2, rows) => {
-        if (err2) return res.status(500).json({ message: 'Commission check failed' });
+        if (err2) {
+          console.error('Commission lookup failed:', err2);
+          return res.status(500).json({ message: 'Commission check failed' });
+        }
 
         if (rows.length === 0) {
           const insertSql = `
@@ -635,16 +661,250 @@ exports.updateLeadStageWithDetails = (req, res) => {
             (lead_id, amount, commission_percent, commission_amount, status, created_at)
             VALUES (?, ?, ?, ?, 'pending', NOW())
           `;
-          db.query(insertSql, [leadId, saleAmount, percent, commission]);
+          db.query(insertSql, [leadId, saleAmount, percent, commission], (err3) => {
+            if (err3) {
+              console.error('Commission insert failed:', err3);
+              return res.status(500).json({ message: 'Commission insert failed' });
+            }
+            return res.status(200).json({ message: 'Stage updated and commission created' });
+          });
+        } else {
+          return res.status(200).json({ message: 'Stage updated (commission already exists)' });
         }
-
-        return res.status(200).json({ message: 'Stage updated and commission created' });
       });
     } else {
       return res.status(200).json({ message: 'Stage updated successfully' });
     }
   });
 };
+
+exports.getCPBankDetails = (req, res) => {
+  const cpId = req.params.cpId;
+  db.query(`SELECT * FROM cp_bank_details WHERE cp_id = ?`, [cpId], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Database error' });
+    return res.status(200).json(rows);
+  });
+};
+
+
+exports.saveCPBankDetails = async (req, res) => {
+  const {
+    cp_id, payment_method, upi_id,
+    account_holder_name, account_number,
+    ifsc_code, bank_name, branch
+  } = req.body;
+
+  if (!cp_id || !payment_method) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    // 1. Insert the bank details
+    const sql = `
+      INSERT INTO cp_bank_details
+      (cp_id, payment_method, upi_id, account_holder_name, account_number, ifsc_code, bank_name, branch)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+      cp_id, payment_method, upi_id || null, account_holder_name || null,
+      account_number || null, ifsc_code || null, bank_name || null, branch || null
+    ];
+
+    await dbAsync.query(sql, values);
+
+    // 2. Create Razorpay Contact if not exists
+    const [cp] = await dbAsync.query('SELECT * FROM channel_partners WHERE id = ?', [cp_id]);
+    if (!cp) return res.status(404).json({ message: 'Channel Partner not found' });
+
+    if (!cp.razorpay_contact_id) {
+      const fakeContactId = `sim_contact_${cp_id}`;
+      await dbAsync.query(
+        'UPDATE channel_partners SET razorpay_contact_id = ? WHERE id = ?',
+        [fakeContactId, cp_id]
+      );
+    }
+
+    // 3. Create Razorpay Fund Account for this payment method
+    const fundId = `sim_fund_${cp_id}_${payment_method}`;
+    const column = payment_method === 'upi' ? 'razorpay_fund_account_upi' : 'razorpay_fund_account_bank';
+
+    await dbAsync.query(
+      `UPDATE cp_bank_details SET ${column} = ? WHERE cp_id = ? AND payment_method = ?`,
+      [fundId, cp_id, payment_method]
+    );
+
+    return res.status(200).json({
+      message: 'Bank details saved and Razorpay simulation setup completed',
+      razorpay_contact_id: cp.razorpay_contact_id || `sim_contact_${cp_id}`,
+      razorpay_fund_account_id: fundId
+    });
+
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'Payment method already added' });
+    }
+    console.error('Save CP bank details failed:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+exports.updateCPBankDetails = async (req, res) => {
+  const {
+    cp_id,
+    payment_method,
+    upi_id,
+    account_holder_name,
+    account_number,
+    ifsc_code,
+    bank_name,
+    branch,
+  } = req.body;
+
+  if (!cp_id || !payment_method) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    // 1. Update the bank details
+    const updateSql = `
+      UPDATE cp_bank_details
+      SET 
+        upi_id = ?, 
+        account_holder_name = ?, 
+        account_number = ?,
+        ifsc_code = ?, 
+        bank_name = ?, 
+        branch = ?
+      WHERE cp_id = ? AND payment_method = ?
+    `;
+
+    const updateValues = [
+      upi_id || null,
+      account_holder_name || null,
+      account_number || null,
+      ifsc_code || null,
+      bank_name || null,
+      branch || null,
+      cp_id,
+      payment_method,
+    ];
+
+    await dbAsync.query(updateSql, updateValues);
+
+    // 2. Simulate Razorpay Contact ID if not exists
+    const [cpRow] = await dbAsync.query(
+      'SELECT razorpay_contact_id FROM channel_partners WHERE id = ?',
+      [cp_id]
+    );
+
+    if (!cpRow?.razorpay_contact_id) {
+      const fakeContactId = `sim_contact_${cp_id}`;
+      await dbAsync.query(
+        'UPDATE channel_partners SET razorpay_contact_id = ? WHERE id = ?',
+        [fakeContactId, cp_id]
+      );
+    }
+
+    // 3. Simulate Razorpay Fund Account ID
+    const fundAccountId = `sim_fund_${cp_id}_${payment_method}`;
+    const fundColumn =
+      payment_method === 'upi'
+        ? 'razorpay_fund_account_upi'
+        : 'razorpay_fund_account_bank';
+
+    await dbAsync.query(
+      `UPDATE cp_bank_details SET ${fundColumn} = ? WHERE cp_id = ? AND payment_method = ?`,
+      [fundAccountId, cp_id, payment_method]
+    );
+
+    res.status(200).json({
+      message: 'Bank details updated and fund account simulated',
+    });
+  } catch (err) {
+    console.error('Update bank details error:', err);
+    res.status(500).json({ message: 'Failed to update bank details' });
+  }
+};
+
+exports.getCommissionDetails = async (req, res) => {
+  try {
+    const rows = await dbAsync.query(`
+      SELECT cr.id, cr.lead_id, cr.amount AS lead_amount, cr.commission_percent,
+             cr.commission_amount, cr.status, cr.payment_reference,
+             cr.paid_at AS closed_at,
+             l.company_name AS lead_title,
+             cp.full_name AS cp_name
+      FROM commission_requests cr
+      JOIN leads l ON cr.lead_id = l.id
+      JOIN channel_partners cp ON l.user_id = cp.id
+      ORDER BY cr.created_at DESC
+    `);
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('Fetch commission error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.cpForgotPasswordInit = async (req, res) => {
+  const { email } = req.body;
+  console.log(email)
+  if (!email) return res.status(400).json({ message: 'Email required' });
+
+  db.query(`SELECT * FROM channel_partners WHERE email = ?`, [email], async (err, rows) => {
+    if (err || rows.length === 0) {
+      return res.status(404).json({ message: 'Email not found' });
+    }
+
+    const tempPass = Math.random().toString(36).slice(-8);
+    const hash = await bcrypt.hash(tempPass, 10);
+
+    db.query(
+      `UPDATE channel_partners SET password_hash = ?, temp_password = true WHERE email = ?`,
+      [hash, email],
+      (err2) => {
+        if (err2) {
+          return res.status(500).json({ message: 'Error updating password' });
+        }
+
+        sendEmail({
+          to: email,
+          subject: 'Temporary Password',
+          text: `Your temporary password is: ${tempPass}`,
+        });
+
+        return res.status(200).json({ message: 'Temp password sent' });
+      }
+    );
+  });
+};
+
+exports.cpForgotPasswordVerify = async (req, res) => {
+ const { email, tempPassword } = req.body;
+  if (!email || !tempPassword) return res.status(400).json({ message: 'Missing fields' });
+
+  db.query(`SELECT * FROM channel_partners WHERE email = ?`, [email], async (err, rows) => {
+    if (err || rows.length === 0) {
+      return res.status(404).json({ message: 'Email not found' });
+    }
+
+    const cp = rows[0];
+    if (!cp.temp_password) {
+      return res.status(400).json({ message: 'Not in temp password mode' });
+    }
+
+    const isMatch = await bcrypt.compare(tempPassword, cp.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid temp password' });
+    }
+
+    return res.status(200).json({ userId: cp.id });
+  });
+};
+
+
+
 
 
 

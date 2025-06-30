@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const util = require('util');
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -17,4 +18,10 @@ db.query('SELECT 1', (err) => {
   else console.log('Connected to the database');
 });
 
-module.exports = db;
+// Create a duplicate version for async/await usage only
+const dbAsync = {
+  ...db,
+  query: util.promisify(db.query).bind(db),
+};
+
+module.exports = { db, dbAsync };

@@ -1,4 +1,4 @@
-const db = require('../models/db');
+const { db } = require('../models/db');
 const { sendEmail } = require('../services/emailservices');
 // const delay = require('../utils/delay');
 const nodemailer = require('nodemailer');
@@ -14,6 +14,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD,
   },
 });
+
 
 exports.subscribe = (req, res) => {
   const { email, htmlBody } = req.body;
@@ -38,6 +39,7 @@ exports.subscribe = (req, res) => {
     });
   });
 };
+
 
 exports.unsubscribe = (req, res) => {
 const email = req.body.email;
