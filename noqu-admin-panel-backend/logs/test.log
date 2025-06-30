@@ -1,0 +1,18 @@
+2025-01-10T09:44:48.758Z - Server is running on http://localhost:3003
+2025-01-10T09:44:48.778Z - Connected to the database
+2025-01-10T09:44:49.559Z - Server is running on http://localhost:3003
+2025-01-10T09:44:49.581Z - Connected to the database
+2025-01-10T09:44:51.737Z - Server is running on http://localhost:3003
+2025-01-10T09:44:51.758Z - Connected to the database
+2025-01-10T09:46:02.964Z - Received request to /api/news
+2025-01-10T09:46:02.967Z - Newslist query results: 
+2025-01-10T09:46:03.213Z - Received request to /api/news
+2025-01-10T09:46:03.214Z - Newslist query results: 
+2025-01-10T09:46:05.627Z - Received request to /api/news
+2025-01-10T09:46:05.628Z - Newslist query results: 
+2025-01-10T09:46:09.079Z - Received request to /api/news
+2025-01-10T09:46:09.079Z - Newslist query results: 
+2025-01-10T09:46:09.341Z - Received request to /api/news
+2025-01-10T09:46:09.343Z - Newslist query results: 
+2025-01-10T09:50:50.066Z [ERROR] - Error processing request: TypeError: Cannot convert object to primitive value
+2025-01-10T09:54:28.832Z [ERROR] - Error processing request: TypeError: Cannot convert object to primitive value
