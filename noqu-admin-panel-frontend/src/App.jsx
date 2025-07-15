@@ -29,6 +29,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import Blog_CMS from './Pages/CMS/Blog_CMS/Blog_CMS';
 
 ChartJS.register(
   CategoryScale,
@@ -96,6 +97,15 @@ function App() {
             element={
               <RoleProtectedRoute allowedRoles={['admin']}>
                 <CMS_News />
+              </RoleProtectedRoute>
+            }
+          />
+
+          <Route
+            path="blogs"
+            element={
+              <RoleProtectedRoute allowedRoles={['admin']}>
+                <Blog_CMS />
               </RoleProtectedRoute>
             }
           />

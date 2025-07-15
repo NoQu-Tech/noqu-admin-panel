@@ -67,6 +67,7 @@ const AdminSidebar = () => {
                 {CMSmenu && (
                   <div className="drop1" style={{ marginLeft: "25px" }}>
                     <li><NavLink to="/news"><img src={arrow1} width={10} style={{ marginRight: 8 }} /> News</NavLink></li>
+                    <li><NavLink to="/blogs"><img src={arrow1} width={10} style={{ marginRight: 8 }} /> Blogs</NavLink></li>
                   </div>
                 )}
               </>
